@@ -83,6 +83,8 @@ class Role(Base, Become, Conditional, Taggable):
         self._had_task_run     = dict()
         self._completed        = dict()
 
+        self._use_tags         = None
+
         super(Role, self).__init__()
 
     def __repr__(self):
@@ -104,6 +106,8 @@ class Role(Base, Become, Conditional, Taggable):
                 params['when'] = role_include.when
             if role_include.tags is not None:
                 params['tags'] = role_include.tags
+            if role_include.use_tags is not None:
+                params['use_tags'] = role_include.use_tags
             hashed_params = hash_params(params)
             if role_include.role in play.ROLE_CACHE:
                 for (entry, role_obj) in iteritems(play.ROLE_CACHE[role_include.role]):
@@ -140,6 +144,7 @@ class Role(Base, Become, Conditional, Taggable):
         self._role_params      = role_include.get_role_params()
         self._variable_manager = role_include.get_variable_manager()
         self._loader           = role_include.get_loader()
+        self._use_tags         = role_include.use_tags
 
         if parent_role:
             self.add_parent(parent_role)
@@ -354,6 +359,7 @@ class Role(Base, Become, Conditional, Taggable):
             new_task_block = task_block.copy()
             new_task_block._dep_chain = new_dep_chain
             new_task_block._play = play
+            new_task_block._use_tags = self._use_tags
             block_list.append(new_task_block)
 
         return block_list

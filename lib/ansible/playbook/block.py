@@ -49,6 +49,7 @@ class Block(Base, Become, Conditional, Taggable):
         self._dep_chain    = None
         self._use_handlers = use_handlers
         self._implicit     = implicit
+        self._use_tags     = None
 
         if task_include:
             self._task_include = task_include
@@ -364,6 +365,11 @@ class Block(Base, Become, Conditional, Taggable):
         Creates a new block, with task lists filtered based on the tags contained
         within the play_context object.
         '''
+        only_tags = play_context.only_tags
+        skip_tags = play_context.skip_tags
+        if self._use_tags is not None:
+            only_tags = self._use_tags
+            skip_tags = []
 
         def evaluate_and_append_task(target):
             tmp_list = []
@@ -371,8 +377,8 @@ class Block(Base, Become, Conditional, Taggable):
                 if isinstance(task, Block):
                     tmp_list.append(evaluate_block(task))
                 elif task.action == 'meta' \
-                or (task.action == 'include' and task.evaluate_tags([], play_context.skip_tags, all_vars=all_vars)) \
-                or task.evaluate_tags(play_context.only_tags, play_context.skip_tags, all_vars=all_vars):
+                or (task.action == 'include' and task.evaluate_tags([], skip_tags, all_vars=all_vars)) \
+                or task.evaluate_tags(only_tags, skip_tags, all_vars=all_vars):
                     tmp_list.append(task)
             return tmp_list
 

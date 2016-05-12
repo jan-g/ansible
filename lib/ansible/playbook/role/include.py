@@ -42,6 +42,7 @@ class RoleInclude(RoleDefinition):
 
     _delegate_to    = FieldAttribute(isa='string')
     _delegate_facts = FieldAttribute(isa='bool', default=False)
+    _use_tags       = FieldAttribute(isa='list', default=None, listof=(string_types,))
 
     def __init__(self, play=None, role_basedir=None, variable_manager=None, loader=None):
         super(RoleInclude, self).__init__(play=play, role_basedir=role_basedir, variable_manager=variable_manager, loader=loader)
@@ -55,4 +56,3 @@ class RoleInclude(RoleDefinition):
 
         ri = RoleInclude(play=play, role_basedir=current_role_path, variable_manager=variable_manager, loader=loader)
         return ri.load_data(data, variable_manager=variable_manager, loader=loader)
-
